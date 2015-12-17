@@ -201,12 +201,6 @@
 #define CONFIG_G_DNL_VENDOR_NUM 0x8087
 #define CONFIG_G_DNL_PRODUCT_NUM 0x0a99
 
-#define CONFIG_DFU_FUNCTION
-#define CONFIG_CMD_DFU
-#define CONFIG_DFU_TIMEOUT
-#define CONFIG_DFU_MMC
-#define CONFIG_DFU_RAM
-
 /*-----------------------------------------------------------------------
  * SCU
  */
