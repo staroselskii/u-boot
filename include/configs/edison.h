@@ -31,7 +31,9 @@
  */
 #define CONFIG_CMD_MEMINFO
 #define CONFIG_CMD_PORTIO
-#define CONFIG_CMD_READ
+/*
+ *#define CONFIG_CMD_READ
+ */
 #define CONFIG_CMD_REGINFO
 /*
  *#define CONFIG_CMD_I2C
