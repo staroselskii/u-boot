@@ -7,10 +7,13 @@
  */
 
 #include <common.h>
+#include <asm/arch/intel-mid.h>
 #include <asm/arch/mmc.h>
 #include <asm/u-boot-x86.h>
 #include <asm/cache.h>
 #include <asm/io.h>
+#include <asm/msr.h>
+#include <intel_scu_ipc.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -33,6 +36,7 @@ int board_early_init_f(void)
 
 int board_early_init_r(void)
 {
+	init_scu_ipc();
 	return 0;
 }
 
