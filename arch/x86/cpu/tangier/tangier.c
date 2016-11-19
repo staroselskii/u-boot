@@ -20,12 +20,8 @@ DECLARE_GLOBAL_DATA_PTR;
 /*
  * Miscellaneous platform dependent initializations
  */
-int cpu_init_f(void)
+int arch_cpu_init(void)
 {
-	/*
-	 *timestamp_init();
-	 */
-
 	return x86_cpu_init_f();
 }
 

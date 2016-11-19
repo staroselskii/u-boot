@@ -30,7 +30,12 @@ int board_usb_init(int index, enum usb_init_type init)
 
 void watchdog_reset(void)
 {
-	ulong now = timer_get_us();
+	ulong now;
+
+	if (gd->timer)
+		now = timer_get_us();
+	else
+		now = rdtsc() / 1000000;
 
 	/* Do not flood SCU */
 	if (unlikely((now - gd->arch.tsc_prev) > (WATCHDOG_HEARTBEAT * 1000))) {
