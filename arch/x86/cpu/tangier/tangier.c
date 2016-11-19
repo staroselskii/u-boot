@@ -62,3 +62,8 @@ int board_mmc_init(bd_t * bis)
 
 	return tangier_sdhci_init(base, index, 4);
 }
+
+void reset_cpu(ulong addr)
+{
+	intel_scu_ipc_simple_command(IPCMSG_COLD_RESET, 0);
+}
