@@ -51,6 +51,22 @@ DECLARE_GLOBAL_DATA_PTR;
 #endif
 #endif
 
+#if defined(CONFIG_INTEL_MID)
+#define UART_MUL		0x34
+#define UART_DIV		0x38
+
+static void ns16550_writel(NS16550_t port, int offset, int value)
+{
+	struct ns16550_platdata *plat = port->plat;
+	unsigned char *addr;
+
+	offset *= 1 << plat->reg_shift;
+	addr = (unsigned char *)plat->base + offset;
+
+	writel(value, addr + plat->reg_offset);
+}
+#endif
+
 #ifndef CONFIG_SYS_NS16550_IER
 #define CONFIG_SYS_NS16550_IER  0x00
 #endif /* CONFIG_SYS_NS16550_IER */
@@ -172,6 +188,15 @@ void NS16550_init(NS16550_t com_port, int baud_divisor)
 #endif
 	serial_out(UART_MCRVAL, &com_port->mcr);
 	serial_out(UART_FCRVAL, &com_port->fcr);
+#if defined(CONFIG_X86_MRFLD)
+	/*
+	 * Set initial frequency to 29491200Hz for backward compatibility.
+	 * XTAL frequency is 38.4MHz.
+	 */
+	ns16550_writel(com_port, UART_MUL, 96);
+	ns16550_writel(com_port, UART_DIV, 125);
+	NS16550_setbrg(com_port, 16);
+#endif
 	if (baud_divisor != -1)
 		NS16550_setbrg(com_port, baud_divisor);
 #if defined(CONFIG_OMAP) || \
