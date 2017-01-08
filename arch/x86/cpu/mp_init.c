@@ -248,7 +248,7 @@ static int load_sipi_vector(atomic_t **ap_countp, int num_cpus)
 	if (!stack)
 		return -ENOMEM;
 	params->stack_top = (u32)(stack + size);
-#if !defined(CONFIG_QEMU) && !defined(CONFIG_HAVE_FSP)
+#if !defined(CONFIG_QEMU) && !defined(CONFIG_HAVE_FSP) && !defined(CONFIG_INTEL_TANGIER)
 	params->microcode_ptr = ucode_base;
 	debug("Microcode at %x\n", params->microcode_ptr);
 #endif
