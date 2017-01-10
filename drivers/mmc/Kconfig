@@ -204,6 +204,9 @@ config MMC_SDHCI_SPEAR
 
 	  If unsure, say N.
 
+config TANGIER_SDHCI
+	bool "Tangier SDHCI controller supprt"
+
 endif
 
 endmenu
