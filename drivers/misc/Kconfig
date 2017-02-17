@@ -167,4 +167,10 @@ config I2C_EEPROM
 	depends on MISC
 	help
 	  Enable a generic driver for EEPROMs attached via I2C.
+
+config INTEL_SCU
+	bool "Enable support for SCU on Intel MID platforms"
+	depends on INTEL_MID
+	default y
+
 endmenu
