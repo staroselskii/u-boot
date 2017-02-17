@@ -168,6 +168,12 @@ config I2C_EEPROM
 	help
 	  Enable a generic driver for EEPROMs attached via I2C.
 
+config INTEL_MID_PMU
+	bool "Support for PMU on Intel MID platforms"
+	depends on MISC
+	depends on INTEL_MID
+	default y
+
 config INTEL_SCU
 	bool "Enable support for SCU on Intel MID platforms"
 	depends on INTEL_MID
