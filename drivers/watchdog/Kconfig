@@ -1,5 +1,13 @@
 menu "WATCHDOG support"
 
+config TANGIER_WATCHDOG
+	bool "Intel Tangier watchdog"
+	depends on INTEL_MID
+	help
+	  This enables support for watchdog controller available on
+	  Intel Tangier SoC. If you're using a board with Intel Tangier
+	  SoC, say Y here.
+
 config ULP_WATCHDOG
 	bool "i.MX7ULP watchdog"
 	help
