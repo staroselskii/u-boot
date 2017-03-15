@@ -478,6 +478,8 @@ static int sdhci_init(struct mmc *mmc)
 {
 	struct sdhci_host *host = mmc->priv;
 
+	board_mmc_power_init();
+
 	sdhci_reset(host, SDHCI_RESET_ALL);
 
 	if ((host->quirks & SDHCI_QUIRK_32BIT_DMA_ADDR) && !aligned_buffer) {
