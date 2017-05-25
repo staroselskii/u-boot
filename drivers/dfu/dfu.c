@@ -16,10 +16,14 @@
 #include <linux/list.h>
 #include <linux/compiler.h>
 
+static bool dfu_enum_request;
 static LIST_HEAD(dfu_list);
 static int dfu_alt_num;
 static int alt_num_cnt;
 static struct hash_algo *dfu_hash_algo;
+#ifdef CONFIG_DFU_TIMEOUT
+static ulong dfu_timeout = 0;
+#endif
 
 /*
  * The purpose of the dfu_usb_get_reset() function is to
@@ -40,6 +44,28 @@ __weak bool dfu_usb_get_reset(void)
 	return true;
 #endif
 }
+
+bool dfu_enum_done(void)
+{
+	return dfu_enum_request;
+}
+
+void dfu_trigger_enum_done()
+{
+	dfu_enum_request = true;
+}
+
+#ifdef CONFIG_DFU_TIMEOUT
+void dfu_set_timeout(ulong timeout)
+{
+	dfu_timeout = timeout;
+}
+
+ulong dfu_get_timeout()
+{
+	return dfu_timeout;
+}
+#endif
 
 static int dfu_find_alt_num(const char *s)
 {
@@ -75,6 +101,7 @@ int dfu_init_env_entities(char *interface, char *devstr)
 		goto done;
 	}
 
+	dfu_enum_request = false;
 done:
 	free(env_bkp);
 	return ret;
