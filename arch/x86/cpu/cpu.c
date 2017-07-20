@@ -197,6 +197,7 @@ int last_stage_init(void)
 
 	/* Don't touch ACPI hardware on HW reduced platforms */
 	if (fadt && !(fadt->flags & ACPI_FADT_HW_REDUCED_ACPI)) {
+debug("ACPI: FULL!\n");
 		/*
 		 * Other than waiting for OSPM to request us to switch to ACPI
 		 * mode, do it by ourselves, since SMI will not be triggered.
