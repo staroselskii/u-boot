@@ -6,6 +6,8 @@
  * Copyright (C) 2016, Bin Meng <bmeng.cn@gmail.com>
  */
 
+#define DEBUG
+
 #include <common.h>
 #include <cpu.h>
 #include <dm.h>
