@@ -5,6 +5,8 @@
  * Partially based on acpi.c for other x86 platforms
  */
 
+#define DEBUG
+
 #include <common.h>
 #include <cpu.h>
 #include <dm.h>
@@ -63,6 +65,7 @@ u32 acpi_fill_mcfg(u32 current)
 	/* TODO: Derive parameters from SFI MCFG table */
 	current += acpi_create_mcfg_mmconfig
 		((struct acpi_mcfg_mmconfig *)current,
+		/* FIXME: Derive from SFI MCFG */
 		0x3f500000, 0x0, 0x0, 0x0);
 
 	return current;
