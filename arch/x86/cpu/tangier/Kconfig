@@ -16,16 +16,6 @@ config INTEL_TANGIER
 
 if INTEL_TANGIER
 
-config PCIE_ECAM_BASE
-	hex
-	default 0xe0000000
-
-config RCBA_BASE
-	hex
-	default 0xfed1c000
-	help
-	  Root Complex register block memory-mapped base address.
-
 config SYS_CAR_ADDR
 	hex
 	default 0x19200000

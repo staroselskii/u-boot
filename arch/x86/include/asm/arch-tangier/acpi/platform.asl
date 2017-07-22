@@ -6,7 +6,6 @@
  */
 
 #include <asm/acpi/statdef.asl>
-#include <asm/arch/iomap.h>
 
 /*
  * The _PTS method (Prepare To Sleep) is called before the OS is
@@ -28,7 +27,4 @@ Method(_WAK, 1)
 Scope (\_SB)
 {
     #include "southcluster.asl"
-
-    /* ACPI devices */
-    #include "hpet.asl"
 }
