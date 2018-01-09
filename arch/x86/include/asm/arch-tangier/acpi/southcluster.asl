@@ -310,6 +310,78 @@ Device (PCI0)
             })
         }
     }
+
+    Device (IPC1)
+    {
+        Name (_ADR, 0x00130000)
+
+        Method (_STA, 0, NotSerialized)
+        {
+            Return (STA_VISIBLE)
+        }
+
+        Device (PMIC)
+        {
+            Name (_ADR, Zero)
+            Name (_HID, "INTC9999")
+            Name (_CID, "INTC9999")
+            Name (_DDN, "Basin Cove PMIC")
+            Name (_DEP, Package ()
+            {
+                IPC1
+            })
+            Method (_STA, 0, NotSerialized)
+            {
+                Return (STA_VISIBLE)
+            }
+
+            Method (_CRS, 0, Serialized)
+            {
+                Name (RBUF, ResourceTemplate ()
+                {
+                    Memory32Fixed(ReadWrite, 0xFFFFF610, 0x00000010, )
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 30 }
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 23 }
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 52 }
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 51 }
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 50 }
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 27 }
+                    Interrupt (ResourceConsumer, Level, ActiveHigh, Shared, ,, ) { 49 }
+                })
+                Return (RBUF)
+            }
+
+            OperationRegion (PMOP, 0x8D, Zero, 0x0100)
+            Field (PMOP, DWordAcc, NoLock, Preserve)
+            {
+                SEL1,   32,
+                SEL2,   32,
+                VCCL,   32,
+                VNNL,   32,
+                AONL,   32,
+                CNTC,   32,
+                CNTN,   32,
+                AONN,   32,
+                CNT1,   32,
+                CNT2,   32,
+                CNT3,   32,
+                FLEX,   32,
+                PRG1,   32,
+                PRG2,   32,
+                PRG3,   32,
+                VLDO,   32,
+            }
+
+            Name (AVBL, Zero)
+            Method (_REG, 2, NotSerialized)
+            {
+                If ((Arg0 == 0x8D))
+                {
+                    AVBL = Arg1
+                }
+            }
+        }
+    }
 }
 
 Device (FLIS)
