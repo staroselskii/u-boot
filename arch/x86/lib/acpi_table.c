@@ -376,24 +376,8 @@ static void acpi_create_spcr(struct acpi_spcr *spcr)
 	if (ret)
 		debug("Can't get information of serial device: %d\n", ret);
 
-	/* Encode baud rate */
-	switch (info.baudrate) {
-	case 9600:
-		spcr->baud_rate = 3;
-		break;
-	case 19200:
-		spcr->baud_rate = 4;
-		break;
-	case 57600:
-		spcr->baud_rate = 6;
-		break;
-	case 115200:
-		spcr->baud_rate = 7;
-		break;
-	default:
-		spcr->baud_rate = 0;
-		break;
-	}
+	/* Let kernel know that console already had been initialized */
+	spcr->baud_rate = 0;
 
 	/* Encode register access size */
 	switch (info.reg_shift) {
