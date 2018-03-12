@@ -301,6 +301,31 @@ struct acpi_mcfg_mmconfig {
 /* ACPI global NVS structure */
 struct acpi_global_nvs;
 
+/* SPCR (Serial Port Console Redirection table) */
+struct __packed acpi_spcr {
+	struct acpi_table_header header;	/* Common ACPI table header */
+	u8 interface_type;	/* 0=full 16550, 1=subset of 16550 */
+	u8 reserved[3];
+	struct acpi_gen_regaddr serial_port;	/* The base address of the Serial Port register set */
+	u8 interrupt_type;
+	u8 pc_interrupt;
+	u32 interrupt;		/* Global system interrupt */
+	u8 baud_rate;
+	u8 parity;
+	u8 stop_bits;
+	u8 flow_control;
+	u8 terminal_type;
+	u8 reserved1;
+	u16 pci_device_id;	/* Must be 0xffff if not PCI device */
+	u16 pci_vendor_id;	/* Must be 0xffff if not PCI device */
+	u8 pci_bus;
+	u8 pci_device;
+	u8 pci_function;
+	u32 pci_flags;
+	u8 pci_segment;
+	u32 reserved2;
+};
+
 /* These can be used by the target port */
 
 void acpi_fill_header(struct acpi_table_header *header, char *signature);
