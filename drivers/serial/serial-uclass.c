@@ -402,6 +402,8 @@ static int serial_post_probe(struct udevice *dev)
 	if (ops->loop)
 		ops->loop += gd->reloc_off
 #endif
+	if (ops->get_info)
+		ops->get_info += gd->reloc_off;
 #endif
 	/* Set the baud rate */
 	if (ops->setbrg) {
