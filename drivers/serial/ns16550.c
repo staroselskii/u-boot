@@ -367,6 +367,19 @@ static int ns16550_serial_setbrg(struct udevice *dev, int baudrate)
 	return 0;
 }
 
+static int ns16550_serial_get_info(struct udevice *dev, struct serial_device_info *info)
+{
+	struct NS16550 *const com_port = dev_get_priv(dev);
+	struct ns16550_platdata *plat = com_port->plat;
+
+	info->addr_space = 0;
+	info->reg_width = 8;
+	info->reg_shift = plat->reg_shift;
+	info->reg_offset = plat->reg_offset;
+	info->addr = plat->base;
+	return 0;
+}
+
 int ns16550_serial_probe(struct udevice *dev)
 {
 	struct NS16550 *const com_port = dev_get_priv(dev);
@@ -467,6 +480,7 @@ const struct dm_serial_ops ns16550_serial_ops = {
 	.pending = ns16550_serial_pending,
 	.getc = ns16550_serial_getc,
 	.setbrg = ns16550_serial_setbrg,
+	.get_info = ns16550_serial_get_info,
 };
 
 #if CONFIG_IS_ENABLED(OF_CONTROL) && !CONFIG_IS_ENABLED(OF_PLATDATA)

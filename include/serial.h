@@ -3,6 +3,16 @@
 
 #include <post.h>
 
+/* TODO: ACPI GAS specification implied */
+struct serial_device_info {
+	unsigned int baudrate;
+	u8	addr_space; /* 0 - MMIO, 1 - IO */
+	u8	reg_width;
+	u8	reg_offset;
+	u8	reg_shift;
+	u64	addr;
+};
+
 struct serial_device {
 	/* enough bytes to match alignment of following func pointer */
 	char	name[16];
@@ -17,6 +27,7 @@ struct serial_device {
 #if CONFIG_POST & CONFIG_SYS_POST_UART
 	void	(*loop)(int);
 #endif
+	int	(*get_info)(struct serial_device_info *info);
 	struct serial_device	*next;
 };
 
@@ -143,6 +154,10 @@ struct dm_serial_ops {
 	 */
 	int (*loop)(struct udevice *dev, int on);
 #endif
+	/**
+	 * get_info() - Get serial device information
+	 */
+	int (*get_info)(struct udevice *dev, struct serial_device_info *info);
 };
 
 /**
