@@ -101,6 +101,43 @@ static int scu_ipc_cmd(struct ipc_regs *regs, u32 cmd, u32 sub,
 	return err;
 }
 
+int scu_ipc_raw_command(u32 cmd, u32 sub,
+			u32 *in, int inlen, u32 *out, int outlen, u32 dptr, u32 sptr)
+{
+
+	struct scu *scu;
+	struct udevice *dev;
+	int ret;
+	int inbuflen = DIV_ROUND_UP(inlen, 4);
+
+
+	ret = syscon_get_by_driver_data(X86_SYSCON_SCU, &dev);
+	if (ret)
+		return ret;
+
+	scu = dev_get_priv(dev);
+
+	/* Up to 16 bytes */
+	if (inbuflen > 4)
+		return -EINVAL;
+
+	writel(dptr, &scu->regs->dptr);
+	writel(sptr, &scu->regs->sptr);
+
+	/*
+	* SRAM controller doesn't support 8-bit writes, it only
+	* supports 32-bit writes, so we have to copy input data into
+	* the temporary buffer, and SCU FW will use the inlen to
+	* determine the actual input data length in the temporary
+	* buffer.
+	*/
+
+	u32 inbuf[4] = {0};
+
+	memcpy(inbuf, in, inlen);
+
+	return scu_ipc_cmd(scu->regs, cmd, sub, inbuf, inlen, out, outlen);
+}
 /**
  * scu_ipc_simple_command() - send a simple command
  * @cmd: command
