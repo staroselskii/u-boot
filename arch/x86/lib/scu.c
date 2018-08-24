@@ -20,6 +20,9 @@
 #include <linux/io.h>
 #include <linux/kernel.h>
 
+#define IPC_READ_BUFFER     0x90
+#define IPC_IOC           0x100     /* IPC command register IOC bit */
+
 /* SCU register map */
 struct ipc_regs {
 	u32 cmd;
@@ -81,6 +84,78 @@ static int scu_ipc_check_status(struct ipc_regs *regs)
 	}
 
 	return 0;
+}
+
+static inline u32 ipc_data_readl(struct scu *scu, u32 offset)
+{
+    return readl(scu->regs + IPC_READ_BUFFER + offset);
+}
+
+static inline void ipc_command(struct scu *scu, u32 cmd)
+{
+	writel(cmd | IPC_IOC, scu->regs);
+	/* ignoring IRQ for now */
+    writel(cmd, scu->regs);
+}
+
+static inline void ipc_data_writel(struct ipc_regs *regs, u32 data, u32 offset)
+{
+	debug("store addr: 0x%x\n", ((phys_addr_t) regs) + 0x80 + offset);
+    writel(data, ((phys_addr_t) regs) + 0x80 + offset);
+}
+
+int scu_ipc_raw_command(u32 cmd, u32 sub,
+		   u32 *in, int inlen, u32 *out, int outlen, u32 dptr, u32 sptr)
+{
+
+	struct scu *scu;
+	struct udevice *dev;
+	int ret;
+
+	ret = syscon_get_by_driver_data(X86_SYSCON_SCU, &dev);
+	if (ret)
+		return ret;
+
+	scu = dev_get_priv(dev);
+
+    int inbuflen = DIV_ROUND_UP(inlen, 4);
+    u32 inbuf[4];
+    int i, err;
+
+    /* Up to 16 bytes */
+    if (inbuflen > 4)
+        return -EINVAL;
+
+
+    writel(dptr, &scu->regs->dptr);
+    writel(sptr, &scu->regs->sptr);
+
+    /*
+     * SRAM controller doesn't support 8-bit writes, it only
+     * supports 32-bit writes, so we have to copy input data into
+     * the temporary buffer, and SCU FW will use the inlen to
+     * determine the actual input data length in the temporary
+     * buffer.
+     */
+    memcpy(inbuf, in, inlen);
+
+    for (i = 0; i < inbuflen; i++)
+        ipc_data_writel(scu->regs, inbuf[i], 4 * i);
+
+
+    ipc_command(scu, (inlen << 16) | (sub << 12) | cmd);
+
+    err = scu_ipc_check_status(scu->regs);
+
+    if (!err) {
+        for (i = 0; i < outlen; i++)
+            *out++ = ipc_data_readl(scu, 4 * i);
+
+    } else {
+		printf("SCU busy. We have no way to recover from it now\n");
+	}
+
+    return err;
 }
 
 static int scu_ipc_cmd(struct ipc_regs *regs, u32 cmd, u32 sub,
