@@ -85,4 +85,9 @@
 		compatible = "intel,reset-tangier";
 		u-boot,dm-pre-reloc;
 	};
+
+	pinctrl {
+		compatible = "intel,pinctrl-tangier";
+		reg = <0xff0c0000 0x8000>;
+	};
 };
