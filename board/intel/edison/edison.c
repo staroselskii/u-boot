@@ -108,5 +108,8 @@ int board_late_init(void)
 	if (!env_get("hardware_id"))
 		assign_hardware_id();
 
+	/* a hack to make I2C#6 work */
+	mrfld_i2c6_setup();
+
 	return 0;
 }
