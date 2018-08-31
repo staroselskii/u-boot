@@ -20,14 +20,6 @@
 /* List of Intel Tangier LSSs */
 #define PMU_LSS_TANGIER_SDIO0_01	1
 
-/* List of Intel Tangier pins */
-#define MRFLD_I2C6_SCL	111
-#define MRFLD_I2C6_SDA	112
-
-/* These are taken from Linux kernel */
-#define MRFLD_PINMODE_MASK	0x07
-#define MRFLD_PIN_BITS	0x01
-
 void board_mmc_power_init(void)
 {
 	pmu_turn_power(PMU_LSS_TANGIER_SDIO0_01, true);
@@ -107,17 +99,6 @@ static void assign_hardware_id(void)
 #endif
 }
 
-int mrfld_i2c6_setup(void)
-{
-	u32 mask = MRFLD_PINMODE_MASK;
-	u32 bits = MRFLD_PIN_BITS;
-
-	mrfld_pinconfig_protected(MRFLD_I2C6_SCL, mask, bits);
-	mrfld_pinconfig_protected(MRFLD_I2C6_SDA, mask, bits);
-
-	return 0;
-}
-
 int board_late_init(void)
 {
 	if (!env_get("serial#"))
@@ -125,14 +106,6 @@ int board_late_init(void)
 
 	if (!env_get("hardware_id"))
 		assign_hardware_id();
-
-	/*
-	 * Initial configuration came from the firmware.
-	 * Which quite likely has been used in the phones, where I2C #8,
-	 * that is not part of Atom peripheral, is in use.
-	 * Thus we need to override the leftover.
-	 */
-	mrfld_i2c6_setup();
 
 	return 0;
 }
