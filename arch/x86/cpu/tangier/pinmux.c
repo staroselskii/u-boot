@@ -89,7 +89,7 @@ mrfld_setup_families(void *base_addr, struct mrfld_family *families, unsigned in
 	}
 }
 
-int mrfld_pinconfig_protected(unsigned int pin, u32 mask, u32 bits)
+static int mrfld_pinconfig_protected(unsigned int pin, u32 mask, u32 bits)
 {
 	struct mrfld_pinctrl *pinctrl;
 	struct udevice *dev;
