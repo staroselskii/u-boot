@@ -5,6 +5,9 @@
 
 #include <common.h>
 #include <dm.h>
+#include <dm/pinctrl.h>
+#include <fdtdec.h>
+#include <fdtdec.h>
 #include <regmap.h>
 #include <syscon.h>
 #include <asm/cpu.h>
@@ -14,6 +17,10 @@
 #define BUFCFG_OFFSET	0x100
 
 #define MRFLD_FAMILY_LEN	0x400
+
+/* These are taken from Linux kernel */
+#define MRFLD_PINMODE_MASK	0x07
+#define MRFLD_PIN_BITS	0x01
 
 #define pin_to_bufno(f, p)	  ((p) - (f)->pin_base)
 
@@ -114,18 +121,58 @@ int mrfld_pinconfig_protected(unsigned int pin, u32 mask, u32 bits)
 
 	return ret;
 }
+static int mrfld_pinctrl_cfg_pin(int pin_node)
+{
+	bool is_protected;
+	int pad_offset;
+	int mode;
+	int ret;
+
+	is_protected = fdtdec_get_bool(gd->fdt_blob, pin_node, "protected");
+	if (!is_protected)
+		return -ENOTSUPP;
+
+	pad_offset = fdtdec_get_int(gd->fdt_blob, pin_node, "pad-offset", -1);
+	if (pad_offset == -1)
+		return -EINVAL;
+
+	mode = fdtdec_get_int(gd->fdt_blob, pin_node, "mode-func", -1);
+	if (mode == -1)
+		return -EINVAL;
+
+	if (mode != 1)
+		return -ENOTSUPP;
+
+	u32 mask = MRFLD_PINMODE_MASK;
+	u32 bits = MRFLD_PIN_BITS;
+
+	ret = mrfld_pinconfig_protected(pad_offset, mask, bits);
+
+	return ret;
+}
 
 static int tangier_pinctrl_probe(struct udevice *dev)
 {
 	void *base_addr = syscon_get_first_range(X86_SYSCON_PINCONF);
-
 	struct mrfld_pinctrl *pinctrl = dev_get_priv(dev);
+	int pin_node;
+	int ret;
 
 	mrfld_setup_families(base_addr, mrfld_families,
 			     ARRAY_SIZE(mrfld_families));
 
 	pinctrl->families = mrfld_families;
 	pinctrl->nfamilies = ARRAY_SIZE(mrfld_families);
+
+	for (pin_node = fdt_first_subnode(gd->fdt_blob, dev_of_offset(dev));
+	     pin_node > 0;
+	     pin_node = fdt_next_subnode(gd->fdt_blob, pin_node)) {
+		ret = mrfld_pinctrl_cfg_pin(pin_node);
+		if (ret != 0) {
+			pr_err("%s: invalid configuration for the pin %d\n",
+			      __func__, pin_node);
+		}
+	}
 
 	return 0;
 }
